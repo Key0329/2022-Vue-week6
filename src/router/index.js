@@ -26,6 +26,11 @@ const routes = [
         name: 'Cart',
         component: () => import('../views/front/CartView.vue'),
       },
+      {
+        path: 'login',
+        name: 'Login',
+        component: () => import('../views/front/LoginView.vue'),
+      },
     ],
   },
   {
@@ -34,14 +39,19 @@ const routes = [
     component: () => import('../views/DashboardView.vue'),
     children: [
       {
-        path: 'login',
-        name: 'Login',
-        component: () => import('../views/admin/LoginView.vue'),
+        path: '',
+        name: 'AdminHome',
+        component: () => import('../views/admin/AdminHomeView.vue'),
       },
       {
         path: 'products/:id(\\d+)?',
-        name: 'ProductsPage',
-        component: () => import('../views/admin/ProductsView.vue'),
+        name: 'AdminProducts',
+        component: () => import('../views/admin/AdminProductsView.vue'),
+      },
+      {
+        path: 'orders',
+        name: 'AdminOrders',
+        component: () => import('../views/admin/AdminOrdersView.vue'),
       },
     ],
   },

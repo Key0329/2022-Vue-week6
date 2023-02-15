@@ -1,12 +1,14 @@
 <!-- eslint-disable camelcase -->
 <script>
-const { VITE_URL, VITE_PATH } = import.meta.env;
+import { mapState, mapActions } from 'pinia';
+import cartStore from '../../stores/front/cartStore';
+import statusStore from '../../stores/statusStore';
+
+const { VITE_PATH, VITE_URL } = import.meta.env;
 
 export default {
   data() {
     return {
-      loadingItem: '',
-      cart: {},
       form: {
         user: {
           name: '',
@@ -18,67 +20,30 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapState(cartStore, ['cart']),
+    ...mapState(statusStore, ['loadingItem']),
+  },
   methods: {
-    getCartsData() {
-      this.$http
-        .get(`${VITE_URL}/api/${VITE_PATH}/cart`)
-        .then((res) => {
-          this.cart = res.data.data;
-        })
-        .catch((err) => {
-          alert(err.response.data.message);
-        });
+    isPhone(value) {
+      const phoneNumber = /^(09)[0-9]{8}$/;
+      return phoneNumber.test(value)
+        ? true
+        : '請填入 09 為開頭的十位數手機號碼';
     },
-    updateCartItem(cart) {
-      const data = {
-        product_id: cart.product.id,
-        qty: cart.qty,
-      };
-
-      this.loadingItem = cart.id;
-
-      this.$http
-        .put(`${VITE_URL}/api/${VITE_PATH}/cart/${cart.id}`, { data })
-        .then(() => {
-          this.getCartsData();
-          this.loadingItem = '';
-          alert('已更新購物車');
-        })
-        .catch((err) => {
-          alert(err.response.data.message);
-        });
-    },
-    deleteCartItem(cart) {
-      this.loadingItem = cart.id;
-
-      this.$http
-        .delete(`${VITE_URL}/api/${VITE_PATH}/cart/${cart.id}`)
-        .then(() => {
-          this.getCartsData();
-          this.loadingItem = '';
-          alert('已刪除該筆訂單');
-        })
-        .catch((err) => {
-          alert(err.response.data.message);
-        });
-    },
-    deleteAllCart() {
-      this.$http
-        .delete(`${VITE_URL}/api/${VITE_PATH}/carts`)
-        .then(() => {
-          this.getCartsData();
-          alert('已清空購物車');
-        })
-        .catch((err) => {
-          alert(err.response.data.message);
-        });
-    },
+    ...mapActions(cartStore, [
+      'deleteAllCart',
+      'deleteCartItem',
+      'getCartsData',
+      'updateCartItem',
+    ]),
     createOrder() {
       if (this.cart.carts.length === 0) {
         alert('購物車內無品項');
         return;
       }
       const order = this.form;
+
       this.$http
         .post(`${VITE_URL}/api/${VITE_PATH}/order`, { data: order })
         .then((res) => {
@@ -90,12 +55,6 @@ export default {
         });
       this.$refs.form.resetForm();
       this.form.message = '';
-    },
-    isPhone(value) {
-      const phoneNumber = /^(09)[0-9]{8}$/;
-      return phoneNumber.test(value)
-        ? true
-        : '請填入 09 為開頭的十位數手機號碼';
     },
   },
   mounted() {
@@ -220,45 +179,54 @@ export default {
           <label for="name" class="form-label">收件人姓名</label>
           <v-field
             id="name"
-            name="姓名"
+            label="姓名"
+            name="username"
             type="text"
             class="form-control"
             placeholder="請輸入姓名"
             v-model="form.user.name"
-            :class="{ 'is-invalid': errors['姓名'] }"
+            :class="{ 'is-invalid': errors['username'] }"
             rules="required"
           ></v-field>
-          <error-message name="姓名" class="invalid-feedback"></error-message>
+          <error-message
+            name="username"
+            class="invalid-feedback"
+          ></error-message>
         </div>
 
         <div class="mb-3">
           <label for="tel" class="form-label">收件人電話</label>
           <v-field
             id="tel"
-            name="電話"
+            name="tel"
+            label="電話"
             type="tel"
             class="form-control"
             placeholder="請輸入電話"
             v-model="form.user.tel"
-            :class="{ 'is-invalid': errors['電話'] }"
+            :class="{ 'is-invalid': errors['tel'] }"
             :rules="isPhone"
           ></v-field>
-          <error-message name="電話" class="invalid-feedback"></error-message>
+          <error-message name="tel" class="invalid-feedback"></error-message>
         </div>
 
         <div class="mb-3">
           <label for="address" class="form-label">收件人地址</label>
           <v-field
             id="address"
-            name="地址"
+            name="address"
+            label="地址"
             type="text"
             class="form-control"
             placeholder="請輸入地址"
             v-model="form.user.address"
-            :class="{ 'is-invalid': errors['地址'] }"
+            :class="{ 'is-invalid': errors['address'] }"
             rules="required"
           ></v-field>
-          <error-message name="地址" class="invalid-feedback"></error-message>
+          <error-message
+            name="address"
+            class="invalid-feedback"
+          ></error-message>
         </div>
 
         <div class="mb-3">

@@ -1,64 +1,22 @@
 <!-- eslint-disable camelcase -->
 <script>
-import UserProductModalComponent from '../../components/front/UserProductModalComponent.vue';
-
-const { VITE_URL, VITE_PATH } = import.meta.env;
+import { mapState, mapActions } from 'pinia';
+import { RouterLink } from 'vue-router';
+import productsStore from '../../stores/front/productsStore';
+import cartStore from '../../stores/front/cartStore';
+import statusStore from '../../stores/statusStore';
 
 export default {
   components: {
-    UserProductModalComponent,
+    RouterLink,
   },
-  data() {
-    return {
-      products: [],
-      product: {},
-      loadingItem: '',
-    };
+  computed: {
+    ...mapState(productsStore, ['products']),
+    ...mapState(statusStore, ['loadingItem']),
   },
   methods: {
-    getProductsData() {
-      this.$http
-        .get(`${VITE_URL}/api/${VITE_PATH}/products/all`)
-        .then((res) => {
-          this.products = res.data.products;
-        })
-        .catch((err) => {
-          alert(err.response.data.message);
-        });
-    },
-    getProductDetail(id) {
-      this.loadingItem = id;
-      this.$http
-        .get(`${VITE_URL}/api/${VITE_PATH}/product/${id}`)
-        .then((res) => {
-          this.product = res.data.product;
-          this.loadingItem = '';
-          this.$refs.userProductModal.openModal();
-        })
-        .catch((err) => {
-          alert(err.response.data.message);
-        });
-    },
-    addToCart(product_id, qty = 1) {
-      const data = {
-        product_id,
-        qty,
-      };
-      this.loadingItem = product_id;
-
-      this.$http
-        .post(`${VITE_URL}/api/${VITE_PATH}/cart`, { data })
-        .then(() => {
-          this.getCartsData();
-          this.$refs.userProductModal.closeModal();
-          this.$refs.userProductModal.qty = 1;
-          this.loadingItem = '';
-          alert('已加入購物車');
-        })
-        .catch((err) => {
-          alert(err);
-        });
-    },
+    ...mapActions(productsStore, ['getProductsData']),
+    ...mapActions(cartStore, ['addToCart']),
   },
   mounted() {
     this.getProductsData();
@@ -73,15 +31,8 @@ export default {
 </script>
 
 <template>
-  <div>這是產品列表</div>
+  <h2 class="my-5">這是產品列表</h2>
   <div class="container">
-    <!-- 產品Modal -->
-    <UserProductModalComponent
-      ref="userProductModal"
-      :tempProduct="product"
-      :add-to-cart="addToCart"
-    ></UserProductModalComponent>
-    <!-- 產品Modal -->
     <table class="table align-middle">
       <thead>
         <tr>
@@ -114,17 +65,12 @@ export default {
           </td>
           <td>
             <div class="btn-group btn-group-sm">
-              <button
-                type="button"
+              <RouterLink
                 class="btn btn-outline-secondary"
-                @click="getProductDetail(product.id)"
+                :to="`product/${product.id}`"
               >
-                <i
-                  class="fas fa-spinner fa-pulse"
-                  v-if="product.id === loadingItem"
-                ></i>
                 查看更多
-              </button>
+              </RouterLink>
               <button
                 type="button"
                 class="btn btn-outline-danger"

@@ -8,8 +8,8 @@ export default {
     },
   },
   methods: {
-    changePage(page, e) {
-      this.$emit('getProductsData', page, e);
+    changePage(e, page = 1) {
+      this.$emit('getProductsData', e, page);
     },
   },
 };
@@ -21,7 +21,7 @@ export default {
       <li class="page-item">
         <router-link
           :to="`/admin/products/${pages.current_page - 1}`"
-          @click.prevent="changePage(pages.current_page - 1, $event)"
+          @click.prevent="changePage($event, pages.current_page - 1)"
           class="page-link"
           :class="{ disabled: !pages.has_pre }"
           href="#"
@@ -39,7 +39,7 @@ export default {
       >
         <router-link
           :to="`/admin/products/${page}`"
-          @click="changePage(page, $event)"
+          @click="changePage($event, page)"
           class="page-link"
           >{{ page }}</router-link
         >
@@ -48,7 +48,7 @@ export default {
       <li class="page-item">
         <router-link
           :to="`/admin/products/${pages.current_page + 1}`"
-          @click.prevent="changePage(pages.current_page + 1, $event)"
+          @click.prevent="changePage($event, pages.current_page + 1)"
           class="page-link"
           :class="{ disabled: !pages.has_next }"
           aria-label="Next"

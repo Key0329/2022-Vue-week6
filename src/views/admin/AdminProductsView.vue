@@ -71,9 +71,9 @@
 </template>
 
 <script>
-import PaginationComponent from '../../components/PaginationComponent/index.vue';
-import ProductModalComponent from '../../components/ProductModalComponent/index.vue';
-import DeleteProductModalComponent from '../../components/DeleteProductModalComponent/index.vue';
+import PaginationComponent from '../../components/admin/PaginationComponent.vue';
+import ProductModalComponent from '../../components/admin/ProductModalComponent.vue';
+import DeleteProductModalComponent from '../../components/admin/DeleteProductModalComponent.vue';
 
 const apiUrl = import.meta.env.VITE_URL;
 const apiPath = import.meta.env.VITE_PATH;
@@ -115,11 +115,9 @@ export default {
     },
     getProductsData(e, page = 1) {
       const { id } = this.$route.params;
-      console.log(id);
-
       let newPage = page;
       if (!e) {
-        newPage = id;
+        newPage = parseInt(id, 10);
       }
 
       this.$http
