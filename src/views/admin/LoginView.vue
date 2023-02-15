@@ -60,10 +60,11 @@ export default {
           document.cookie = `hexVueWeek3Token=${token};expires=${new Date(
             expired
           )};`;
-          this.$router.push({ path: '/admin/products' });
+          this.$router.push({ path: './admin/products' });
         })
         .catch((err) => {
           alert(err.response.data.message);
+          this.$router.push({ path: './admin/login' });
         });
     },
   },
