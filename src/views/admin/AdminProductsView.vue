@@ -93,26 +93,7 @@ export default {
     ProductModalComponent,
     DeleteProductModalComponent,
   },
-  mounted() {
-    const token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)hexVueWeek3Token\s*=\s*([^;]*).*$)|^.*$/,
-      '$1'
-    );
-    this.$http.defaults.headers.common.Authorization = token;
-    this.checkAdmin();
-  },
   methods: {
-    checkAdmin() {
-      this.$http
-        .post(`${apiUrl}/api/user/check`)
-        .then(() => {
-          this.getProductsData();
-        })
-        .catch(() => {
-          alert('登入失敗');
-          this.$router.push('/login');
-        });
-    },
     getProductsData(e, page = 1) {
       const { id } = this.$route.params;
       let newPage = page;
@@ -128,7 +109,7 @@ export default {
           this.forceRerender();
         })
         .catch((err) => {
-          alert(err);
+          alert(err.response.data.message);
         });
     },
     modelHandler(button, product) {
@@ -148,6 +129,14 @@ export default {
     forceRerender() {
       this.rerenderKey += 1;
     },
+  },
+  mounted() {
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)hexVueWeek3Token\s*=\s*([^;]*).*$)|^.*$/,
+      '$1'
+    );
+    this.$http.defaults.headers.common.Authorization = token;
+    this.getProductsData();
   },
 };
 </script>

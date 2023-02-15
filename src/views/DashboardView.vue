@@ -11,10 +11,35 @@
 <script>
 import { RouterView, RouterLink } from 'vue-router';
 
+const { VITE_URL } = import.meta.env;
+
 export default {
   components: {
     RouterView,
     RouterLink,
+  },
+  methods: {
+    logout() {
+      document.cookie = `hexVueWeek3Token=;expires=${new Date()};`;
+      this.$router.push('/login');
+    },
+    checkAdmin() {
+      this.$http
+        .post(`${VITE_URL}/api/user/check`)
+        .then(() => {})
+        .catch(() => {
+          alert('登入失敗');
+          this.$router.push('/login');
+        });
+    },
+  },
+  mounted() {
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)hexVueWeek3Token\s*=\s*([^;]*).*$)|^.*$/,
+      '$1'
+    );
+    this.$http.defaults.headers.common.Authorization = token;
+    this.checkAdmin();
   },
 };
 </script>
